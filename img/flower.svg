@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" font-family="sans-serif" font-size="14">
+  <rect width="320" height="200" fill="#fff" rx="12"/>
+  <!-- 茎 -->
+  <rect x="155" y="140" width="10" height="55" fill="#6aa84f"/>
+  <!-- がく -->
+  <path d="M120 140 L160 110 L200 140 Z" fill="#8fce6a" stroke="#4e8a35" stroke-width="2"/>
+  <!-- 花弁 -->
+  <ellipse cx="110" cy="95" rx="32" ry="20" fill="#ffd84d" stroke="#d6a800" stroke-width="2" transform="rotate(-30 110 95)"/>
+  <ellipse cx="210" cy="95" rx="32" ry="20" fill="#ffd84d" stroke="#d6a800" stroke-width="2" transform="rotate(30 210 95)"/>
+  <!-- おしべ -->
+  <g stroke="#7a5c00" stroke-width="2">
+    <line x1="135" y1="120" x2="125" y2="70"/><line x1="185" y1="120" x2="195" y2="70"/>
+    <line x1="145" y1="120" x2="140" y2="62"/><line x1="175" y1="120" x2="180" y2="62"/>
+  </g>
+  <g fill="#b8860b"><ellipse cx="125" cy="66" rx="5" ry="7"/><ellipse cx="195" cy="66" rx="5" ry="7"/><ellipse cx="140" cy="58" rx="5" ry="7"/><ellipse cx="180" cy="58" rx="5" ry="7"/></g>
+  <!-- めしべ -->
+  <rect x="156" y="60" width="8" height="62" fill="#9ccc65" stroke="#4e8a35" stroke-width="2"/>
+  <ellipse cx="160" cy="56" rx="9" ry="6" fill="#cddc39" stroke="#4e8a35" stroke-width="2"/>
+  <ellipse cx="160" cy="118" rx="12" ry="14" fill="#aed581" stroke="#4e8a35" stroke-width="2"/>
+  <!-- ラベル -->
+  <g fill="#222" font-weight="bold">
+    <line x1="160" y1="50" x2="240" y2="30" stroke="#222"/><text x="244" y="34">ア</text>
+    <line x1="125" y1="66" x2="60" y2="40" stroke="#222"/><text x="40" y="44">イ</text>
+    <line x1="238" y1="95" x2="280" y2="110" stroke="#222"/><text x="284" y="114">ウ</text>
+    <line x1="195" y1="138" x2="250" y2="165" stroke="#222"/><text x="254" y="170">エ</text>
+    <line x1="160" y1="128" x2="95" y2="170" stroke="#222"/><text x="76" y="176">オ</text>
+  </g>
+</svg>

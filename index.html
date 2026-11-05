@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ff8a00">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DE kitazo!">
+<title>DE kitazo!</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" class="app">
+  <header class="top">
+    <button class="back" id="btn-back" aria-label="戻る" hidden>‹</button>
+    <div class="brand"><span class="logo">DE kitazo!</span><span class="sub" id="top-sub">中3理科</span></div>
+    <button class="gear" id="btn-settings" aria-label="設定">⚙</button>
+  </header>
+  <main id="screen" class="screen"></main>
+</div>
+<div id="toast" class="toast" hidden></div>
+<script src="config.js"></script>
+<script src="core.js"></script>
+<script>
+  // サーバーにつなぐとき（config.js の api あり）は問題をサーバーから受け取る。モックのときだけ data/*.js を読む
+  (function () {
+    var api = (window.DEKITAZO_CONFIG || {}).api;
+    var list = api ? ["app.js"] : ["data/index.js", "data/rika3.js", "app.js"];
+    (function next(i) {
+      if (i >= list.length) return;
+      var s = document.createElement("script"); s.src = list[i]; s.onload = function () { next(i + 1); };
+      document.body.appendChild(s);
+    })(0);
+  })();
+</script>
+</body>
+</html>
