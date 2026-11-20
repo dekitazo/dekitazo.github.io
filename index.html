@@ -30,7 +30,7 @@
   // サーバーにつなぐとき（config.js の api あり）は問題をサーバーから受け取る。モックのときだけ data/*.js を読む
   (function () {
     var api = (window.DEKITAZO_CONFIG || {}).api;
-    var list = api ? ["app.js"] : ["data/index.js", "data/rika3.js", "app.js"];
+    var list = api ? ["app.js"] : ["data/index.js", "data/rika3.js", "data/rekishi.js", "app.js"];
     (function next(i) {
       if (i >= list.length) return;
       var s = document.createElement("script"); s.src = list[i]; s.onload = function () { next(i + 1); };

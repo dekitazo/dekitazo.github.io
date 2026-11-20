@@ -109,7 +109,7 @@ h2 { font-size: 17px; margin: 18px 0 8px; }
 .verdict { margin-top: 14px; border-radius: 14px; padding: 12px 14px; font-weight: 700; }
 .verdict.ok { background: var(--ok-soft); color: var(--ok); }
 .verdict.ng { background: var(--ng-soft); color: var(--ng); }
-.verdict .exp { display: block; margin-top: 6px; font-weight: 500; color: var(--ink); font-size: 14px; }
+.verdict .exp { display: block; margin-top: 6px; font-weight: 500; color: var(--ink); font-size: 14px; white-space: pre-line; }
 .next { margin-top: 12px; }
 
 /* 結果 */

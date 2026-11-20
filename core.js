@@ -18,6 +18,9 @@ window.DEKITAZO_CORE = (() => {
     d.forEach(x => taken.add(x));
     // 問題文に選択肢が列挙されている（「A，B，Cのうち」）ときは、その中だけで出す（3択になることもある）
     if (d.length >= 2 && /のうち/.test(q.q)) return d;
+    // 誤答を2つだけ書いた問題（「AとBのどちらか」「大きくなる／小さくなる／変わらない」など）も、書かれた2つだけで出す（3択）。
+    // 自動で足すと関係のない語（「上流・中流・下流」に「火砕流」など）が混ざるため。誤答が0〜1個のときだけ似た答えから足す
+    if (d.length === 2) return d;
     if (d.length < 3) {
       const cand = uniq(all.filter(x => x.id !== q.id && !taken.has(x.a)).map(x => x.a));
       const unitOf = {}; all.forEach(x => { if (!(x.a in unitOf)) unitOf[x.a] = x.unit; });
