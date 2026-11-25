@@ -146,7 +146,7 @@
   const screenSignup = () => {
     const no = h("input", { class: "f", id: "in-no", inputmode: "numeric", placeholder: "例: 0012-3456", autocomplete: "off" });
     const pin = h("input", { class: "f", id: "in-pin", inputmode: "numeric", type: "password", maxlength: 4, placeholder: "4桁" });
-    const nick = h("input", { class: "f", id: "in-nick", placeholder: "ランキングに出る名前（本名は使わない）", maxlength: 10 });
+    const nick = h("input", { class: "f", id: "in-nick", placeholder: "ランキングに出る名前", maxlength: 10 });
     const err = h("div", { class: "err" });
     const btn = h("button", { class: "btn", onclick: () => go() }, "はじめる");
     const go = async () => {
