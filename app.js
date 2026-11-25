@@ -144,13 +144,17 @@
 
   // ---------- 登録・ログイン ----------
   const screenSignup = () => {
-    const no = h("input", { class: "f", id: "in-no", inputmode: "numeric", placeholder: "例: 12345", autocomplete: "off" });
+    const no = h("input", { class: "f", id: "in-no", inputmode: "numeric", placeholder: "例: 0012-3456", autocomplete: "off" });
     const pin = h("input", { class: "f", id: "in-pin", inputmode: "numeric", type: "password", maxlength: 4, placeholder: "4桁" });
     const nick = h("input", { class: "f", id: "in-nick", placeholder: "ランキングに出る名前（本名は使わない）", maxlength: 10 });
     const err = h("div", { class: "err" });
     const btn = h("button", { class: "btn", onclick: () => go() }, "はじめる");
     const go = async () => {
-      const n = no.value.trim(), p = pin.value.trim(), k = nick.value.trim();
+      // 生徒番号は「0096-8731」「00968731」「968731」のどれで打っても同じ番号にする
+      // （全角の数字は半角に、ハイフンと空白は取り、頭の 0 は落とす。シートには頭の 0 なしで書いてある）
+      const han = s => s.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+      const n = han(no.value).replace(/[\s\-‐-―ー－]/g, "").replace(/^0+(?=\d)/, "");
+      const p = han(pin.value).trim(), k = nick.value.trim();
       if (!/^\d{1,10}$/.test(n)) return err.textContent = "生徒番号を数字で入れてください";
       if (!/^\d{4}$/.test(p)) return err.textContent = "合言葉は4桁の数字です";
       if (!ONLINE) {
