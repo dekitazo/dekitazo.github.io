@@ -80,7 +80,7 @@
   .rk { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
   .rk:last-child { border-bottom: 0; }
   .rk .pos { font-weight: 900; font-size: 16px; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .rk.top .pos { color: var(--accent); }
+  .rk.lead .pos { color: var(--accent); }   /* 「top」は上の見出し（.top＝貼りつき・背景つき）と名前がぶつかるので使わない */
   .rk .nm { min-width: 0; } .rk .nm b { display: block; overflow-wrap: anywhere; }
   .rk .nm span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .rk .sc { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }

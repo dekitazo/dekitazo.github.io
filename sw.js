@@ -1,5 +1,5 @@
 // できたぞ service worker: アプリ本体はキャッシュ、問題データは新しいものを優先
-const VER = "dekitazo-v0.3.0-c5bd5a03";
+const VER = "dekitazo-v0.3.0-052cc46f";
 const SHELL = ["./", "./index.html", "./style.css", "./config.js", "./core.js", "./app.js", "./manifest.webmanifest",
   "./img/flower.svg", "./img/force.svg", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png"];
 self.addEventListener("install", e => {

@@ -85,7 +85,7 @@
     const list = ui.rm === "count" ? rows.slice().sort((a, b) => b.ok - a.ok || b.pct - a.pct) : rows.filter(x => x.n >= min).sort((a, b) => b.pct - a.pct || b.n - a.n);
     const short = ui.rm === "pct" ? rows.filter(x => x.n < min) : [];
     const row = (x, i) => [i === top ? h("div", { class: "cut" }, "ここから下は生徒の画面には出ません（上位 " + top + " 人まで）") : null,
-      h("div", { class: "rk" + (i < 3 ? " top" : "") }, h("div", { class: "pos" }, String(i + 1)),
+      h("div", { class: "rk" + (i < 3 ? " lead" : "") }, h("div", { class: "pos" }, String(i + 1)),
         h("div", { class: "nm" }, h("b", {}, x.s.nick), h("span", {}, juku(x.s.no) + (x.s.cls ? "・" + x.s.cls : ""))),
         ui.rm === "count" ? h("div", { class: "sc" }, h("b", {}, num(x.ok), h("small", {}, "問正解")), h("span", {}, num(x.n) + "問中・" + x.pct + "%"))
           : h("div", { class: "sc" }, h("b", {}, String(x.pct), h("small", {}, "%")), h("span", {}, num(x.n) + "問中 " + num(x.ok) + "問")))];
