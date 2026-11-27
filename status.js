@@ -10,7 +10,7 @@
       if (k === "class") el.className = v; else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
       else if (v !== false && v != null) el.setAttribute(k, v === true ? "" : v);
     }
-    for (const k of kids.flat()) if (k != null && k !== false) el.append(k.nodeType ? k : document.createTextNode(k));
+    for (const k of kids.flat(Infinity)) if (k != null && k !== false) el.append(k.nodeType ? k : document.createTextNode(k));
     return el;
   };
   const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch { return d; } };
@@ -20,6 +20,7 @@
   let D = null, err = "", busy = false, loadedAt = 0;
   const ui = Object.assign({ sort: "last", cls: "", open: {} }, lsGet("dekitazo.status.ui", {}));
   ui.open = {};                                   // 開いたカードは覚えない（開き直したら畳んでおく）
+  ui.view = "status"; ui.rp = "week"; ui.rm = "count";   // 画面（状況／ランキング）、ランキングの期間と種類。開き直したら最初に戻す
   const saveUi = () => lsSet("dekitazo.status.ui", { sort: ui.sort, cls: ui.cls });
 
   // ---------- 表示の部品 ----------
@@ -75,6 +76,27 @@
     no: ["生徒番号順", (a, b) => Number(a.no) - Number(b.no)],
   };
 
+  // ランキング。生徒の画面（GAS の ranking_）と同じ決め方: ニックネームのある生徒だけ・試し用のクラスは出さない・クラスで分けない。
+  // 正答数は 正答の数 → 正答率、正答率は rankMin 問以上の生徒だけで 正答率 → 解答数。生徒には上位 rankTop 人のニックネームだけが見える
+  const seg = (cur, opts, on) => h("div", { class: "seg" }, opts.map(([k, lab]) => h("button", { class: k === cur ? "on" : "", "aria-pressed": k === cur ? "true" : "false", onclick: () => on(k) }, lab)));
+  const rankView = real => {
+    const k = ui.rp === "month" ? "m" : "w", min = D.rankMin || 30, top = D.rankTop || 20;
+    const rows = real.filter(s => s.nick && s[k] && s[k][0]).map(s => ({ s, n: s[k][0], ok: s[k][1], pct: Math.round(100 * s[k][1] / s[k][0]) }));
+    const list = ui.rm === "count" ? rows.slice().sort((a, b) => b.ok - a.ok || b.pct - a.pct) : rows.filter(x => x.n >= min).sort((a, b) => b.pct - a.pct || b.n - a.n);
+    const short = ui.rm === "pct" ? rows.filter(x => x.n < min) : [];
+    const row = (x, i) => [i === top ? h("div", { class: "cut" }, "ここから下は生徒の画面には出ません（上位 " + top + " 人まで）") : null,
+      h("div", { class: "rk" + (i < 3 ? " top" : "") }, h("div", { class: "pos" }, String(i + 1)),
+        h("div", { class: "nm" }, h("b", {}, x.s.nick), h("span", {}, juku(x.s.no) + (x.s.cls ? "・" + x.s.cls : ""))),
+        ui.rm === "count" ? h("div", { class: "sc" }, h("b", {}, num(x.ok), h("small", {}, "問正解")), h("span", {}, num(x.n) + "問中・" + x.pct + "%"))
+          : h("div", { class: "sc" }, h("b", {}, String(x.pct), h("small", {}, "%")), h("span", {}, num(x.n) + "問中 " + num(x.ok) + "問")))];
+    return [
+      h("div", { style: "margin-top:12px" }, seg(ui.rp, [["week", "今週"], ["month", "今月"]], v => { ui.rp = v; render(); })),
+      seg(ui.rm, [["count", "正答数"], ["pct", "正答率"]], v => { ui.rm = v; render(); }),
+      h("p", { class: "muted", style: "margin:8px 2px" }, (ui.rm === "count" ? "正解した問題の数の順です。" : (ui.rp === "month" ? "今月" : "今週") + " " + min + "問以上解いた生徒だけ、正答率の順です。") + "生徒の画面と同じ順位で、生徒にはニックネームだけが見えます。"),
+      list.length ? h("section", { class: "box" }, list.map(row)) : h("p", { class: "msg" }, ui.rm === "pct" && rows.length ? "まだ " + min + "問以上解いた生徒がいません" : "この期間はまだだれも解いていません"),
+      short.length ? [h("h2", {}, min + "問未満でのっていない生徒（" + short.length + "人）"), h("section", { class: "box" }, h("div", { class: "nolist" }, short.map(x => h("span", {}, x.s.nick + " " + x.n + "問"))))] : null];
+  };
+
   // 先生の鍵の入力
   const keyForm = msg => {
     const inp = h("input", { class: "f", type: "password", autocomplete: "off", placeholder: "設定シートの「先生の鍵」", value: key || "" });
@@ -88,12 +110,15 @@
   const render = () => {
     $("reload").disabled = busy; $("reload").textContent = busy ? "更新中…" : "更新";
     const main = $("main");
+    $("views").hidden = !D;
+    document.querySelectorAll("#views button").forEach(b => { b.classList.toggle("on", b.dataset.v === ui.view); b.setAttribute("aria-pressed", b.dataset.v === ui.view ? "true" : "false"); });
     if (!API) return main.replaceChildren(h("p", { class: "msg" }, "サーバーの設定がありません（config.js の api）。"));
     if (!key || err === "key") return main.replaceChildren(keyForm(err === "key" ? "鍵がちがいます。" : ""));
     if (!D) return main.replaceChildren(h("p", { class: "msg" }, err || "読み込み中…"));
     const now = D.at, units = D.units;
     $("at").textContent = md(now) + " " + hm(now) + " 時点" + (err ? "（" + err + "）" : "");
     const real = D.students.filter(s => !s.test);
+    if (ui.view === "rank") return main.replaceChildren(...rankView(real).flat(Infinity).filter(Boolean));
     const classes = [...new Set(real.map(s => s.cls).filter(Boolean))];
     if (ui.cls && !classes.includes(ui.cls)) ui.cls = "";
     const all = real.filter(s => !ui.cls || s.cls === ui.cls);
@@ -133,6 +158,7 @@
     busy = false; render();
   };
   $("reload").onclick = load;
+  document.querySelectorAll("#views button").forEach(b => b.onclick = () => { ui.view = b.dataset.v; render(); window.scrollTo(0, 0); });
   // 開きっぱなしで戻ってきたとき（1 分以上たっていたら）読み直す
   document.addEventListener("visibilitychange", () => { if (!document.hidden && D && Date.now() - loadedAt > 60e3) load(); });
   load();
