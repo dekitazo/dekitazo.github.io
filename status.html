@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
+<title>DE kitazo! 生徒の状況</title>
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-title" content="生徒の状況">
+<style>
+  :root { --bg:#fff7ec; --card:#fff; --ink:#2b2118; --muted:#8a7a6a; --line:#f1e3cf; --accent:#ff8a00; --accent-soft:#ffe6c2; --ok:#19a974; --ok-soft:#d9f6e8; --ng:#e5484d; --ng-soft:#ffe0e1; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#1b1612; --card:#26201a; --ink:#f6efe6; --muted:#b3a390; --line:#3a3028; --accent:#ff9a1f; --accent-soft:#4a3415; --ok:#3ad48f; --ok-soft:#173b2c; --ng:#ff6b6f; --ng-soft:#4a1f22; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg:#1b1612; --card:#26201a; --ink:#f6efe6; --muted:#b3a390; --line:#3a3028; --accent:#ff9a1f; --accent-soft:#4a3415; --ok:#3ad48f; --ok-soft:#173b2c; --ng:#ff6b6f; --ng-soft:#4a1f22; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", Meiryo, sans-serif; font-size: 15px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px calc(40px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .top { position: sticky; top: 0; background: var(--bg); z-index: 5; padding: calc(8px + env(safe-area-inset-top, 0px)) 0 8px; border-bottom: 1px solid var(--line); }
+  .bar { display: flex; align-items: center; gap: 8px; }
+  .logo { font-weight: 900; font-style: italic; color: var(--accent); font-size: 18px; font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  .logo small { font-style: normal; color: var(--muted); font-weight: 600; font-size: 12px; margin-left: 6px; font-family: inherit; }
+  .reload { margin-left: auto; border: 0; background: var(--accent); color: #fff; font: inherit; font-weight: 800; border-radius: 999px; padding: 8px 16px; min-height: 40px; cursor: pointer; touch-action: manipulation; }
+  .reload:disabled { opacity: .6; }
+  .sub { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .sub a { color: var(--accent); font-weight: 700; text-decoration: none; }
+  .num { font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .tile { background: var(--card); border-radius: 14px; padding: 10px 12px; box-shadow: 0 2px 10px rgba(80,50,10,.08); }
+  .tile .lab { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .tile .val { font-size: 22px; font-weight: 900; line-height: 1.25; font-variant-numeric: tabular-nums; }
+  .tile .val small { font-size: 12px; font-weight: 700; color: var(--muted); margin-left: 3px; }
+  .tile .ext { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  h2 { font-size: 14px; margin: 20px 0 6px; display: flex; align-items: center; gap: 8px; }
+  h2 select { margin-left: auto; font: inherit; font-size: 16px; font-weight: 600; padding: 6px 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); max-width: 60%; }
+  .box { background: var(--card); border-radius: 16px; padding: 12px; box-shadow: 0 2px 10px rgba(80,50,10,.08); }
+  .box + .box { margin-top: 10px; }
+  /* 単元ごとの行（名前・棒・正答率・問題数） */
+  .urow { display: grid; grid-template-columns: minmax(0, 1fr) 64px 40px 52px; gap: 8px; align-items: center; padding: 4px 0; font-size: 13px; }
+  .urow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .urow .nm b { color: var(--muted); font-weight: 800; margin-right: 5px; font-variant-numeric: tabular-nums; }
+  .track { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .fill { height: 100%; border-radius: 999px; }
+  .fill.hi { background: var(--ok); } .fill.mid { background: var(--accent); } .fill.lo { background: var(--ng); }
+  .urow .pc { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .urow .n { text-align: right; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .urow.none { color: var(--muted); }
+  /* 生徒のカード */
+  .who { display: flex; align-items: baseline; gap: 8px; }
+  .nick { font-weight: 800; font-size: 16px; min-width: 0; overflow-wrap: anywhere; }
+  .sno { margin-left: auto; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .when { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .when .stop { color: var(--ng); font-weight: 700; }
+  .when .fire { color: var(--accent); font-weight: 700; }
+  .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .nums > div { background: var(--bg); border-radius: 10px; padding: 6px 8px; }
+  .nums .lab { font-size: 11px; color: var(--muted); font-weight: 700; }
+  .nums .v { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .nums .v small { font-weight: 600; color: var(--muted); font-size: 11px; }
+  .nums .p { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .stripbtn { display: block; width: 100%; border: 0; background: none; padding: 8px 0 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; touch-action: manipulation; }
+  .cap { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+  .strip { display: grid; gap: 3px; }
+  .cell { border-radius: 6px; padding: 2px 0 3px; text-align: center; background: var(--bg); min-width: 0; }
+  .cell i { display: block; font-style: normal; font-size: 9px; color: var(--muted); line-height: 1.2; }
+  .cell b { display: block; font-size: 11px; line-height: 1.25; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .cell.hi { background: var(--ok-soft); } .cell.mid { background: var(--accent-soft); } .cell.lo { background: var(--ng-soft); }
+  .cell.few b { font-weight: 500; opacity: .7; }
+  .cell.none b { color: var(--muted); font-weight: 500; }
+  .ud { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 6px; }
+  .nolist { display: flex; flex-wrap: wrap; gap: 6px; }
+  .nolist span { background: var(--bg); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .f { width: 100%; font: inherit; font-size: 16px; padding: 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); }
+  .f:focus-visible, .reload:focus-visible, .stripbtn:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn { border: 0; background: var(--accent); color: #fff; font: inherit; font-weight: 800; border-radius: 12px; padding: 10px 18px; margin-top: 8px; min-height: 44px; cursor: pointer; }
+  .msg { text-align: center; padding: 28px 0; color: var(--muted); }
+</style>
+</head><body>
+<div class="wrap">
+  <div class="top">
+    <div class="bar"><div class="logo">DE kitazo!<small>生徒の状況</small></div><button class="reload" id="reload">更新</button></div>
+    <div class="sub"><span id="at" class="num"></span><a href="check.html">全問チェック ›</a></div>
+  </div>
+  <div id="main"></div>
+</div>
+<script src="config.js"></script>
+<script src="status.js"></script>
+</body></html>

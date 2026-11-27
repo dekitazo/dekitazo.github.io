@@ -178,6 +178,8 @@
   document.querySelectorAll("#filters button").forEach(b => b.onclick = () => { ui.filter = b.dataset.f; saveUi(); render(); });
   $("open-all").onclick = () => { ui.openAll = !ui.openAll; saveUi(); render(); };
 
+  if ($("to-status")) $("to-status").hidden = !SHEET;   // 生徒の状況（status.html）はサーバーにつながるときだけ
+
   // ---------- 起動 ----------
   const start = async () => {
     ready = false; loadErr = ""; render();
